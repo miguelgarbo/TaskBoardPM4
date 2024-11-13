@@ -1,4 +1,4 @@
-# 4ProjetoMensalMiguel
+# TaskBoard
 
 O projeto deste mês consiste na criação de um site dinâmico utilizando HTML, CSS e JavaScript, integrando dados fornecidos por um back-end já implementado 
 (a documentação será disponibilizada). Este back-end estará disponível, permitindo que eles utilizem as funcionalidades do sistema para contemplar os requisitos.
