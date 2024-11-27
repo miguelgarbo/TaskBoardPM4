@@ -5,46 +5,6 @@
 
 const containerTasks = document.querySelector(".container-tasks")
 
-function createColumn(){
-    
- const columnDiv = document.createElement("div")
-
-        columnDiv.classList.add("column");
-
-const headerColumn = document.createElement("div")
-
-        headerColumn.classList.add("header-column")
-
-const titleColumn = document.createElement("h5")
-
-        titleColumn.id = "name-task"
-        titleColumn.textContent = inputNameColumn;
-
-const itemPencil = document.createElement("i")
-
-        itemPencil.classList.add("bi", "bi-pencil")
-        itemPencil.id =  "edit-column"
-        itemPencil.onclick = editBoard;
-
-            headerColumn.appendChild(titleColumn)
-            headerColumn.appendChild(itemPencil)
-
-const buttonNewCard = document.createElement("button")
-
-        buttonNewCard.id = "buttonNewCard"
-        buttonNewCard.type = "button"
-        buttonNewCard.textContent = "Add Cartão +"
-        buttonNewCard.classList.add("btn", "btn-primary")
-
-        columnDiv.appendChild(headerColumn)
-        columnDiv.appendChild(buttonNewCard)
-        containerTasks.insertBefore(columnDiv, buttonNewColumn);
-
-
-
-
-}
-
 //função validando null de qualquer input
 
 function validNull(input){
@@ -126,9 +86,10 @@ function showColumn(){
     buttonConfirm.textContent = "Confirmar Coluna"
     //fim do botão de confirmar 
 
-    buttonConfirm.addEventListener("click", function () {
+    buttonConfirm.addEventListener("click", confirmColumnName)
+        
+        function confirmColumnName () {
 
-        //adicionando função para o botão de confirmar coluna
         const inputNameColumn = document.getElementById("input-name-column").value
 
         if(validNull(inputNameColumn)){
@@ -152,8 +113,10 @@ function showColumn(){
 
         itemPencil.classList.add("bi", "bi-pencil")
         itemPencil.id =  "edit-column"
-        itemPencil.onclick = editBoard;
-        //fim da coluna 
+        itemPencil.addEventListener("click", function() {
+            editBoard(columnDiv);
+        });
+                //fim da coluna 
 
      if (currentBoardId) {
              postColumns(currentBoardId, inputNameColumn);
@@ -191,7 +154,10 @@ function showColumn(){
 
         //função de nova task
         
-    buttonNewCard.addEventListener("click", function(){
+    buttonNewCard.addEventListener("click", createNewCards)
+        
+        
+ function createNewCards(){
 
         const inputCard = document.createElement("input")
 
@@ -208,12 +174,13 @@ function showColumn(){
 
                 columnDiv.insertBefore(buttonConfirmDescriptionCard, buttonNewCard)
 
-        buttonConfirmDescriptionCard.addEventListener("click", function(){
+        buttonConfirmDescriptionCard.addEventListener("click", confirmCard)
+            
+    function confirmCard(){
 
         const descriptionCard = inputCard.value
 
             if(validNull(descriptionCard)){
-
             return
         } 
 
@@ -230,15 +197,13 @@ function showColumn(){
         buttonConfirmDescriptionCard.remove()
         inputCard.remove()
 
-        })
+        }
 
 
         columnDiv.insertBefore(inputCard, buttonNewCard)
+    }
 
-    })
-    
-
-    });
+    }
 
 
     //botando na tela
@@ -323,7 +288,7 @@ getBoardsToDropDown()
 
 //fim
 
-function editBoard(){
+function editBoard(column){
 
     column.classList.add("edit-column-style")
     
@@ -512,8 +477,10 @@ function printColumns(columns) {
         const itemPencil = document.createElement("i");
             itemPencil.classList.add("bi", "bi-pencil");
             itemPencil.id = "edit-column";
-            itemPencil.onclick = editBoard;
-
+            itemPencil.addEventListener("click", function() {
+                editBoard(columnDiv);
+            });
+            
         const buttonNewCard = document.createElement("button");
             buttonNewCard.id = "buttonNewCard";
             buttonNewCard.type = "button";
