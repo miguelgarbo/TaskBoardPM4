@@ -1,6 +1,50 @@
 // import axios from 'axios'
 //arrumar indexPosition
 
+
+
+const containerTasks = document.querySelector(".container-tasks")
+
+function createColumn(){
+    
+ const columnDiv = document.createElement("div")
+
+        columnDiv.classList.add("column");
+
+const headerColumn = document.createElement("div")
+
+        headerColumn.classList.add("header-column")
+
+const titleColumn = document.createElement("h5")
+
+        titleColumn.id = "name-task"
+        titleColumn.textContent = inputNameColumn;
+
+const itemPencil = document.createElement("i")
+
+        itemPencil.classList.add("bi", "bi-pencil")
+        itemPencil.id =  "edit-column"
+        itemPencil.onclick = editBoard;
+
+            headerColumn.appendChild(titleColumn)
+            headerColumn.appendChild(itemPencil)
+
+const buttonNewCard = document.createElement("button")
+
+        buttonNewCard.id = "buttonNewCard"
+        buttonNewCard.type = "button"
+        buttonNewCard.textContent = "Add Cartão +"
+        buttonNewCard.classList.add("btn", "btn-primary")
+
+        columnDiv.appendChild(headerColumn)
+        columnDiv.appendChild(buttonNewCard)
+        containerTasks.insertBefore(columnDiv, buttonNewColumn);
+
+
+
+
+}
+
 //função validando null de qualquer input
 
 function validNull(input){
@@ -24,7 +68,6 @@ const statusBackgroundText = document.querySelector("#status-background")
 const containerTask = document.querySelector(".background-board")
 const header = document.getElementsByTagName("header")[0]
 const column = document.querySelector(".column")
-const textsBoard = document.querySelector(".board-texts")
 
 
 inputCheckBoxSwitch.addEventListener("change", function(){
@@ -33,19 +76,18 @@ inputCheckBoxSwitch.addEventListener("change", function(){
     if(inputCheckBoxSwitch.checked){
 
         statusBackgroundText.textContent = "Light"
-        containerTask.classList.add("light-mode")
+
+        containerTask.classList.add("light-mode-board")
         header.classList.add("light-header")
         column.classList.add("light-mode-column")
-        textsBoard.classList.add("text-mode-light")
 
 
         }else{
 
             statusBackgroundText.textContent = "Dark"
-            containerTask.classList.remove("light-mode")
+            containerTask.classList.remove("light-mode-board")
             header.classList.remove("light-header")
             column.classList.remove("light-mode-column")
-            textsBoard.classList.remove("text-mode-light")
 
         }
 })
@@ -54,10 +96,13 @@ let currentBoardId = null;
 
 const buttonNewColumn = document.getElementById("btn-new-column")
 
-buttonNewColumn.addEventListener("click", function(){
+buttonNewColumn.style.display = "none"
+
+buttonNewColumn.addEventListener("click", showColumn)
+    
+function showColumn(){
 
     //função que está criando uma coluna provisória com o input
-
     const containerTasks = document.querySelector(".container-tasks");
 
     //criando coluna
@@ -78,14 +123,12 @@ buttonNewColumn.addEventListener("click", function(){
     buttonConfirm.classList.add("btn", "btn-primary")
     buttonConfirm.id = "btn-confirm-new-column"
     buttonConfirm.type = "button"
-    buttonConfirm.textContent = "Criar Coluna"
+    buttonConfirm.textContent = "Confirmar Coluna"
     //fim do botão de confirmar 
 
     buttonConfirm.addEventListener("click", function () {
 
         //adicionando função para o botão de confirmar coluna
-
-        const containerTasks = document.querySelector(".container-tasks")
         const inputNameColumn = document.getElementById("input-name-column").value
 
         if(validNull(inputNameColumn)){
@@ -147,40 +190,40 @@ buttonNewColumn.addEventListener("click", function(){
 
 
         //função de nova task
+        
     buttonNewCard.addEventListener("click", function(){
 
         const inputCard = document.createElement("input")
 
-        inputCard.type = "text"
-        inputCard.id = "descriptionCard"
-        inputCard.classList.add("form-control")
-        inputCard.placeholder = "Descrição Do Cartão.."
-
+            inputCard.type = "text"
+            inputCard.id = "descriptionCard"
+            inputCard.classList.add("form-control")
+            inputCard.placeholder = "Descrição Do Cartão.."
 
         const buttonConfirmDescriptionCard = document.createElement("button");
 
-        buttonConfirmDescriptionCard.textContent = "Confirmar Cartão"
-        buttonConfirmDescriptionCard.classList.add("btn", "btn-success")
-        buttonConfirmDescriptionCard.type = "button"
+            buttonConfirmDescriptionCard.textContent = "Confirmar Cartão"
+            buttonConfirmDescriptionCard.classList.add("btn", "btn-success")
+            buttonConfirmDescriptionCard.type = "button"
 
-        columnDiv.insertBefore(buttonConfirmDescriptionCard, buttonNewCard)
+                columnDiv.insertBefore(buttonConfirmDescriptionCard, buttonNewCard)
 
         buttonConfirmDescriptionCard.addEventListener("click", function(){
 
         const descriptionCard = inputCard.value
 
-        if(validNull(descriptionCard)){
+            if(validNull(descriptionCard)){
 
             return
         } 
 
         const cardTask = document.createElement("div")
 
-        cardTask.classList.add("card-task")
-        cardTask.textContent = descriptionCard
+            cardTask.classList.add("card-task")
+            cardTask.textContent = descriptionCard
 
 
-        columnDiv.insertBefore(cardTask, buttonNewCard)
+                columnDiv.insertBefore(cardTask, buttonNewCard)
 
         //removendo botoes apos o clique de confirmação
 
@@ -204,9 +247,7 @@ buttonNewColumn.addEventListener("click", function(){
 
     containerTasks.insertBefore(newColumn, buttonNewColumn);
 
-
-
-})
+}
 
 //pegar dados dos boards e printalos no dropdown
 
@@ -240,8 +281,9 @@ async function getBoardsToDropDown() {
 
         li.addEventListener("click", (e)=> {
             e.preventDefault()
+
             loadBoardPicked(board.Id)
-            displayColumnsFromBoard(board.Id)
+            getColumnsByBoardId(board.Id)
 
         })
 
@@ -256,19 +298,21 @@ async function getBoardsToDropDown() {
 
 async function loadBoardPicked(boardId){
 
+    buttonNewColumn.style.display = "block"
+
     const resposta = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Board?BoardId=${boardId}`)
 
     const dataBoard = await resposta.json()
 
-    const nameBoard = document.querySelector("#boardName")
+    const nameBoard = document.querySelector(".boardName")
 
-    const descriptionBoard = document.querySelector("#boardDescription")
+    const descriptionBoard = document.querySelector(".boardDescription")
 
-    const backgroundBoard = document.querySelector(".background-board")
+    // const backgroundBoard = document.querySelector(".background-board")
 
     nameBoard.innerText = dataBoard.Name
     descriptionBoard.innerText = dataBoard.Description
-    backgroundBoard.style.setProperty("background-color", dataBoard.HexaBackgroundCoor);
+    // backgroundBoard.style.setProperty("background-color", dataBoard.HexaBackgroundCoor);
 
     currentBoardId = boardId;
 
@@ -316,17 +360,20 @@ function editBoard(){
 
 function helloUser(){
 
+    const boardName = document.querySelector(".boardName")
+
    const dataUser =  JSON.parse(localStorage.getItem("userDatas"))
 
-   console.log(dataUser)
+   console.log(dataUser);
 
-   const nameDiv = document.querySelector("#nameUser")
-
-   nameDiv.innerHTML = `Olá, ${dataUser.name.split(" ")[0]}`
+   boardName.innerHTML = `Olá, ${dataUser.name.split(" ")[0]}`
 
 }
 
 helloUser()
+
+
+
 
 function logout(){
 
@@ -376,6 +423,7 @@ async function postColumns(boardId,nameColumn) {
 
     console.log("Coluna Criada com Sucesso, ID DA COLUNA: ", respostaDataColumn)
 
+
     indexPosition++
 
     }catch(erro){
@@ -387,73 +435,116 @@ async function postColumns(boardId,nameColumn) {
 
 
 
+async function getColumnsByBoardId(boardId) {
 
-async function displayColumnsFromBoard(boardId){
+    const APIurl = `https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/ColumnByBoardId?BoardId=${boardId}`;
 
-    const url =  `https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/ColumnByBoardId?BoardId=${boardId}`;
-    
-    try{
+    try {
+        const response = await fetch(APIurl);
 
-         const response = await fetch(url)
+        if (!response.ok) {
+            console.error(`Erro na requisição: ${response.statusText}`);
+        }
 
-         if(!response.ok){
+        const dataColumns = await response.json();
 
-        console.error(`Erro: ${response.statusText}`);
+        console.log(dataColumns) //array das Columns
 
-    }
-
-    const listColumnsFromBoard = await response.json()
-
-    console.log(listColumnsFromBoard);
-
-    const containerTasks = document.querySelector(".container-tasks");
-
-
-    listColumnsFromBoard.forEach(dataBoard =>{
+        printColumns(dataColumns) //exibindo tds colunas antes das tasks
 
         
+        //iterarando o array de columns para acessar cada um
+        dataColumns.forEach((column) => {
 
-        const columnDiv = document.createElement("div");
-        columnDiv.classList.add("column");
+            console.log(column)
+            //o then aqui ta tratando o return da promise getTasksByColumnId
 
-         const headerColumn = document.createElement("div")
-         headerColumn.classList.add("header-column")
+            getTasksByColumnId(column.Id).then((arrayTasks) => {
 
-         const titleColumn = document.createElement("h5")
+                console.log(arrayTasks) 
 
-         titleColumn.id = "name-task";
-         titleColumn.textContent = dataBoard.Name; //add nome da api
+                    printTasks(column.Id, arrayTasks);
 
+                })
+        });
 
-         // criando botão de editar.
-        const itemPencil = document.createElement("i")
-
-        itemPencil.classList.add("bi", "bi-pencil")
-        itemPencil.id =  "edit-column"
-        itemPencil.onclick = editBoard;
-
-         const buttonNewCard = document.createElement("button")
-         buttonNewCard.id = "buttonNewCard"
-         buttonNewCard.type = "button"
-         buttonNewCard.textContent = "Add Cartão +"
-         buttonNewCard.classList.add("btn", "btn-primary")
-
-        headerColumn.appendChild(titleColumn)
-        headerColumn.appendChild(itemPencil)
-        //fim da coluna 
-
-        columnDiv.appendChild(headerColumn)
-        columnDiv.appendChild(buttonNewCard)
-    
-        containerTasks.insertBefore(columnDiv, buttonNewColumn)
-
-    })    
-
-    }catch(erro){
-
-        console.error("Erro Catch: ",erro)
+    } catch (error) {
+        console.error("Erro ao obter colunas:", error);
     }
-    
-
 }
 
+
+async function getTasksByColumnId(columnId) {
+
+    const url = `https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/TasksByColumnId?ColumnId=${columnId}`;
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            console.error(`Erro na requisição: ${response.statusText}`);
+        }
+
+        const arrayTasks = await response.json();
+
+        return arrayTasks;
+
+    } catch (error) {
+        console.error(`Erro ao pegar tasks`, error);
+    }
+}
+
+function printColumns(columns) {
+
+    columns.forEach((column) => {
+
+        const columnDiv = document.createElement("div");
+            columnDiv.classList.add("column");
+            columnDiv.id = column.Id
+
+        const headerColumn = document.createElement("div");
+            headerColumn.classList.add("header-column");
+
+        const titleColumn = document.createElement("h5");
+            titleColumn.id = "name-task";
+            titleColumn.textContent = column.Name;
+
+        const itemPencil = document.createElement("i");
+            itemPencil.classList.add("bi", "bi-pencil");
+            itemPencil.id = "edit-column";
+            itemPencil.onclick = editBoard;
+
+        const buttonNewCard = document.createElement("button");
+            buttonNewCard.id = "buttonNewCard";
+            buttonNewCard.type = "button";
+            buttonNewCard.textContent = "Add Cartão +";
+            buttonNewCard.classList.add("btn", "btn-primary");
+
+                headerColumn.appendChild(titleColumn)
+                headerColumn.appendChild(itemPencil)
+
+                columnDiv.appendChild(headerColumn)
+                columnDiv.appendChild(buttonNewCard)
+
+
+            containerTasks.insertBefore(columnDiv, buttonNewColumn);
+    });
+}
+
+function printTasks(columnId, arrayTasks) {
+
+    const columnDiv = document.getElementById(`${columnId}`);
+
+    const buttonNewCard = columnDiv.querySelector("#buttonNewCard");
+    
+    arrayTasks.forEach((task) => {
+
+        const tasksStruct = document.createElement("div");
+
+        tasksStruct.classList.add("card-task");
+        
+        tasksStruct.textContent = task.Title;
+        columnDiv.insertBefore(tasksStruct, buttonNewCard);
+
+    });
+}

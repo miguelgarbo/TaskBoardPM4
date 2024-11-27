@@ -129,7 +129,7 @@ select{
     overflow-x: scroll;
     
 
-    height: 100%;
+    height: 90%;
 
     align-items: flex-start; /* Permite alturas diferentes entre as colunas */
 
@@ -150,17 +150,16 @@ select{
 
 }
 
+
 .board-texts{
 
     background-color: transparent;
-    color: white;
 
 }
 
 .text-mode-light{
 
     color: black;
-
 
 }
 
@@ -175,6 +174,8 @@ select{
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: black !important;
+
 }
 
 .card-task{
@@ -185,6 +186,8 @@ select{
 
     max-width: 100%; 
     overflow-wrap: break-word;
+
+
 
 
     border-radius: 5px;
@@ -206,11 +209,15 @@ background-color: rgb(219, 219, 219) !important;
 
 .light-mode-column{
 
-
     background-color: rgb(255, 255, 255);
 
 }
 
+.light-mode-text{
+
+
+    color: black;
+}
 
 .input-column{
 
@@ -269,7 +276,7 @@ font-size: 12pt !important;
 }
 
 
-#boardName{
+.boardName{
 
 
     padding-left: 70px;
@@ -278,9 +285,8 @@ font-size: 12pt !important;
 
 }
 
-#boardDescription{
+.boardDescription{
 
-    color: rgb(189, 172, 172);
     padding-bottom: 15px;
     padding-left: 70px;
 
@@ -296,9 +302,33 @@ font-size: 12pt !important;
 .background-board{
 
     background-color: black;
-    width: 200%;
+    color: rgb(255, 255, 255);
+    width: 1900px;
 
     height: 100%;
+
+}
+
+.light-mode-board{
+
+    background-color: rgb(255, 255, 255);
+
+    color: rgb(0, 0, 0);
+}
+
+
+.welcome-user{
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align:start;
+    flex-direction: column;
+
+    height: 100%;
+    width: 70%;
+
+
 
 }
 
