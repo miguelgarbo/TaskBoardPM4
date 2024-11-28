@@ -9,7 +9,7 @@ const containerTasks = document.querySelector(".container-tasks")
 
 function validNull(input){
 
-    if(input === ""){
+    if (!input.trim()) {
 
         alert("Campo de texto Vazio, Por Favor digite algo antes de confirmar");
 
@@ -36,7 +36,6 @@ inputCheckBoxSwitch.addEventListener("change", function(){
     if(inputCheckBoxSwitch.checked){
 
         statusBackgroundText.textContent = "Light"
-
         containerTask.classList.add("light-mode-board")
         column.classList.add("light-mode-column")
 
@@ -51,165 +50,164 @@ inputCheckBoxSwitch.addEventListener("change", function(){
 })
 
 let currentBoardId = null;
+let currentColumnId = null;
 
 const buttonNewColumn = document.getElementById("btn-new-column")
 
 buttonNewColumn.style.display = "none"
 
-buttonNewColumn.addEventListener("click", createColumn)
-    
-function createColumn(){
+buttonNewColumn.addEventListener("click", createColumn);
 
-    //função que está criando uma coluna provisória com o input
+function createColumn() {
     const containerTasks = document.querySelector(".container-tasks");
 
-    //criando coluna
     let newColumn = document.createElement("div");
 
-    newColumn.classList.add("column", "input-column");
+        newColumn.classList.add("column", "input-column");
 
-    let inputDiv = document.createElement("input")
-    inputDiv.id = "input-name-column"
-    inputDiv.classList.add("form-control")
-    inputDiv.type = "text"
-    inputDiv.placeholder = "Nome da Coluna"
-    //fim 
+    let inputDiv = document.createElement("input");
 
-    //criando botão de confirmar coluna.
+        inputDiv.id = "input-name-column";
+        inputDiv.classList.add("form-control");
+        inputDiv.type = "text";
+        inputDiv.placeholder = "Nome da Coluna";
 
-    const buttonConfirm = document.createElement("button")
-    buttonConfirm.classList.add("btn", "btn-primary")
-    buttonConfirm.id = "btn-confirm-new-column"
-    buttonConfirm.type = "button"
-    buttonConfirm.textContent = "Confirmar Coluna"
-    //fim do botão de confirmar 
+    const buttonConfirm = document.createElement("button");
 
-    buttonConfirm.addEventListener("click", confirmColumnName)
-        
-        function confirmColumnName () {
+        buttonConfirm.classList.add("btn", "btn-primary");
+        buttonConfirm.id = "btn-confirm-new-column";
+        buttonConfirm.type = "button";
+        buttonConfirm.textContent = "Confirmar Coluna";
 
-        const inputNameColumn = document.getElementById("input-name-column").value
+    buttonConfirm.addEventListener("click", function(){ 
 
-        if(validNull(inputNameColumn)){
-            return
-        } 
-    
-        //criando a coluna definitiva
-        const columnDiv = document.createElement("div");
-        columnDiv.classList.add("column");
+        confirmColumnName(containerTasks, newColumn, inputDiv)
+    });
 
-        const headerColumn = document.createElement("div")
-        headerColumn.classList.add("header-column")
-
-        const titleColumn = document.createElement("h5")
-
-        titleColumn.id = "name-task";
-        titleColumn.textContent = inputNameColumn;
-
-        //criando botão de editar.
-        const itemPencil = document.createElement("i")
-
-        itemPencil.classList.add("bi", "bi-pencil")
-        itemPencil.id =  "edit-column"
-        itemPencil.addEventListener("click", function() {
-            editBoard(columnDiv);
-        });
-                //fim da coluna 
-
-     if (currentBoardId) {
-             postColumns(currentBoardId, inputNameColumn);
-
-        } else {
-                console.log("Nenhum board foi selecionado.");
-        return
-}
-
-        //adicionando titulo e icone de edição na coluna definitiva
-        headerColumn.appendChild(titleColumn)
-        headerColumn.appendChild(itemPencil)
-
-        //criando botão de novas tasks(cards)
-        const buttonNewCard = document.createElement("button")
-        buttonNewCard.id = "buttonNewCard"
-        buttonNewCard.type = "button"
-        buttonNewCard.textContent = "Add Cartão +"
-        buttonNewCard.classList.add("btn", "btn-primary")
-        //fim
-
-        //adicionando tudo no html
-        columnDiv.appendChild(headerColumn)
-        columnDiv.appendChild(buttonNewCard)
-        containerTasks.insertBefore(columnDiv, buttonNewColumn);
-        //fim
-
-        //removendo input da coluna pós confirmar
-
-        const inputNewColumn = document.querySelector(".input-column");
-
-        inputNewColumn.remove()
-        //fim
-
-
-        //função de nova task
-        
-    buttonNewCard.addEventListener("click", createNewCards)
-        
-        
- function createNewCards(){
-
-        const inputCard = document.createElement("input")
-
-            inputCard.type = "text"
-            inputCard.id = "descriptionCard"
-            inputCard.classList.add("form-control")
-            inputCard.placeholder = "Descrição Do Cartão.."
-
-        const buttonConfirmDescriptionCard = document.createElement("button");
-
-            buttonConfirmDescriptionCard.textContent = "Confirmar Cartão"
-            buttonConfirmDescriptionCard.classList.add("btn", "btn-success")
-            buttonConfirmDescriptionCard.type = "button"
-
-                columnDiv.insertBefore(buttonConfirmDescriptionCard, buttonNewCard)
-
-        buttonConfirmDescriptionCard.addEventListener("click", confirmCard)
-            
-    function confirmCard(){
-
-        const descriptionCard = inputCard.value
-
-            if(validNull(descriptionCard)){
-            return
-        } 
-
-        const cardTask = document.createElement("div")
-
-            cardTask.classList.add("card-task")
-            cardTask.textContent = descriptionCard
-
-
-                columnDiv.insertBefore(cardTask, buttonNewCard)
-
-        //removendo botoes apos o clique de confirmação
-
-        buttonConfirmDescriptionCard.remove()
-        inputCard.remove()
-
-        }
-
-
-        columnDiv.insertBefore(inputCard, buttonNewCard)
-    }
-
-    }
-
-    //printando na tela
-    newColumn.appendChild(inputDiv)
-    newColumn.appendChild(buttonConfirm)
+            newColumn.appendChild(inputDiv);
+            newColumn.appendChild(buttonConfirm);
 
     containerTasks.insertBefore(newColumn, buttonNewColumn);
+}
+
+function confirmColumnName(containerTasks, newColumn, inputDiv) {
+
+    const inputNameColumn = inputDiv.value;
+
+    if (validNull(inputNameColumn)) {
+        return;
+    }
+
+    const columnDiv = document.createElement("div");
+        columnDiv.classList.add("column");
+
+    const headerColumn = createHeaderColumn(inputNameColumn, columnDiv);
+
+    const buttonNewCard = document.createElement("button");
+
+        buttonNewCard.id = "buttonNewCard";
+        buttonNewCard.type = "button";
+        buttonNewCard.textContent = "Add Cartão +";
+        buttonNewCard.classList.add("btn", "btn-primary");
+
+    buttonNewCard.addEventListener("click", function(){
+
+        createNewCards(columnDiv, buttonNewCard)
+
+    });
+
+    columnDiv.appendChild(headerColumn);
+    columnDiv.appendChild(buttonNewCard);
+
+    containerTasks.insertBefore(columnDiv, buttonNewColumn);
+
+    newColumn.remove();
+
+        postColumns(currentBoardId, inputNameColumn);
+            
+}
+
+function createHeaderColumn(inputNameColumn, columnDiv) {
+
+    const headerColumn = document.createElement("div");
+
+        headerColumn.classList.add("header-column");
+
+    const titleColumn = document.createElement("h5");
+
+        titleColumn.classList.add("column-name");
+        titleColumn.textContent = inputNameColumn;
+
+    const itemPencil = document.createElement("i");
+
+        itemPencil.classList.add("bi", "bi-pencil");
+        itemPencil.id = "edit-column";
+
+    itemPencil.addEventListener("click", function(){
+        editBoard(columnDiv)
+    });
+
+    headerColumn.appendChild(titleColumn);
+    headerColumn.appendChild(itemPencil);
+
+    return headerColumn;
+}
+
+function createNewCards(columnDiv, buttonNewCard) {
+
+
+    const inputCard = document.createElement("input");
+
+        inputCard.type = "text";
+        inputCard.id = "descriptionCard";
+        inputCard.classList.add("form-control");
+        inputCard.placeholder = "Descrição Do Cartão..";
+
+    const buttonConfirmDescriptionCard = document.createElement("button");
+
+        buttonConfirmDescriptionCard.textContent = "Confirmar Cartão";
+        buttonConfirmDescriptionCard.classList.add("btn", "btn-success");
+        buttonConfirmDescriptionCard.type = "button";
+
+    buttonConfirmDescriptionCard.addEventListener("click", function(){
+
+        confirmCard(columnDiv, buttonNewCard, inputCard, buttonConfirmDescriptionCard)
+
+    });
+
+            columnDiv.insertBefore(inputCard, buttonNewCard);
+            columnDiv.insertBefore(buttonConfirmDescriptionCard, buttonNewCard);
+}
+
+function confirmCard(columnDiv, buttonNewCard, inputCard, buttonConfirmDescriptionCard) {
+
+
+    const descriptionCard = inputCard.value;
+
+    if (validNull(descriptionCard)) {
+        return;
+    }
+
+    const cardTask = document.createElement("div");
+
+        cardTask.classList.add("card-task");
+        cardTask.textContent = descriptionCard;
+
+    columnDiv.insertBefore(cardTask, buttonNewCard);
+
+    inputCard.remove();
+    buttonConfirmDescriptionCard.remove();
+
+    const columnId = columnDiv.id
+
+    postTasks(columnId, descriptionCard);
+
+
 
 }
+
+
+
 
 //pegar dados dos boards e printalos no dropdown
 
@@ -286,21 +284,20 @@ getBoardsToDropDown()
 //fim
 
 function editBoard(column){
-
+    
     column.classList.add("edit-column-style")
     
-    const nameColumnBeforeValue = document.querySelector("#name-task").textContent;
-    const nameColumnBefore = document.querySelector("#name-task");
-
+    const nameColumnBefore = column.querySelector(".column-name");
     const inputEditNameColumn = document.createElement("input")
 
-    inputEditNameColumn.classList.add("form-control")
-    inputEditNameColumn.id = "input-edit-name"
-    inputEditNameColumn.value = nameColumnBeforeValue
+        inputEditNameColumn.classList.add("form-control")
+        inputEditNameColumn.id = "input-edit-name"
+        inputEditNameColumn.value = nameColumnBefore.textContent
+
 
     nameColumnBefore.textContent = ""
 
-    nameColumnBefore.appendChild(inputEditNameColumn)
+            nameColumnBefore.appendChild(inputEditNameColumn)
 
 
     inputEditNameColumn.addEventListener("keydown", function(e){
@@ -309,6 +306,7 @@ function editBoard(column){
             column.classList.remove("edit-column-style")
 
             const newNameColumn = inputEditNameColumn.value
+
 
             if(validNull(newNameColumn)){
                 return
@@ -396,6 +394,32 @@ async function postColumns(boardId,nameColumn) {
 }
 
 
+async function postTasks(columnId, titleTask){
+
+    const dataTask = {
+
+        ColumnId: columnId,
+        Title: titleTask,
+        Description: "",
+        IsActive: true,
+        CreatedBy: 6
+}
+
+
+    const response = await fetch("https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Task",
+        {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(dataTask)
+        }
+
+    )
+
+    const idTask = await response.json()
+
+    console.log(idTask);
+
+}
 
 async function getColumnsByBoardId(boardId) {
 
@@ -413,25 +437,25 @@ async function getColumnsByBoardId(boardId) {
 
         console.log(dataColumns) //array das Columns
 
-
-            // containerTasks.innerHTML = ""; 
         
-            printColumns(dataColumns); // Exibe as colunas antes das tasks   
+            printColumns(dataColumns); // Exibe as colunas antes das tasks  
+
 
         
         //iterarando o array de columns para acessar cada um
-
         dataColumns.forEach((column) => {
 
             console.log(column.Id)
+            currentColumnId = column.Id
 
             //o then aqui ta tratando o return da promise getTasksByColumnId
-
             getTasksByColumnId(column.Id).then((arrayTasks) => {
 
                 console.log(arrayTasks) 
 
-                    printTasks(column.Id, arrayTasks);
+                    printTasks(column.Id, arrayTasks)
+
+
 
                 })
         });
@@ -464,31 +488,42 @@ async function getTasksByColumnId(columnId) {
 
 function printColumns(columns) {
 
-
     columns.forEach((column) => {
 
-        const columnDiv = document.createElement("div");
-            columnDiv.classList.add("column");
+        const columnDiv = document.createElement("div")
+            columnDiv.classList.add("column")
             columnDiv.id = column.Id
 
-        const headerColumn = document.createElement("div");
-            headerColumn.classList.add("header-column");
+        const headerColumn = document.createElement("div")
 
-        const titleColumn = document.createElement("h5");
-            titleColumn.textContent = column.Name;
+            headerColumn.classList.add("header-column")
 
-        const itemPencil = document.createElement("i");
-            itemPencil.classList.add("bi", "bi-pencil");
-            itemPencil.id = "edit-column";
+        const titleColumn = document.createElement("h5")
+
+            titleColumn.textContent = column.Name
+            titleColumn.classList.add("column-name")
+
+
+        const itemPencil = document.createElement("i")
+
+            itemPencil.classList.add("bi", "bi-pencil")
+            itemPencil.id = "edit-column"
             itemPencil.addEventListener("click", function() {
                 editBoard(columnDiv);
             });
             
-        const buttonNewCard = document.createElement("button");
-            buttonNewCard.id = "buttonNewCard";
-            buttonNewCard.type = "button";
-            buttonNewCard.textContent = "Add Cartão +";
-            buttonNewCard.classList.add("btn", "btn-primary");
+        const buttonNewCard = document.createElement("button")
+
+            buttonNewCard.id = "buttonNewCard"
+            buttonNewCard.type = "button"
+            buttonNewCard.textContent = "Add Cartão +"
+            buttonNewCard.classList.add("btn", "btn-primary")
+
+            buttonNewCard.addEventListener("click", function(){
+
+                createNewCards(columnDiv, buttonNewCard)
+        
+            });
 
                 headerColumn.appendChild(titleColumn)
                 headerColumn.appendChild(itemPencil)
@@ -497,7 +532,7 @@ function printColumns(columns) {
                 columnDiv.appendChild(buttonNewCard)
 
 
-            containerTasks.insertBefore(columnDiv, buttonNewColumn);
+            containerTasks.insertBefore(columnDiv, buttonNewColumn)
     });
 
 
@@ -515,6 +550,7 @@ function printTasks(columnId, arrayTasks) {
         const tasksStruct = document.createElement("div");
 
         tasksStruct.classList.add("card-task");
+        tasksStruct.id = task.Id
         
         tasksStruct.textContent = task.Title;
         columnDiv.insertBefore(tasksStruct, buttonNewCard);
