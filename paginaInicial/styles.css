@@ -126,10 +126,12 @@ select{
 .container-tasks{
 
 
+
     overflow-x: scroll;
     
-
-    height: 90%;
+    width: 100%; /* ou outra largura desejada */
+    height: 500px; /* defina uma altura fixa */
+    /* height: 90%; */
 
     align-items: flex-start; /* Permite alturas diferentes entre as colunas */
 
@@ -169,7 +171,10 @@ select{
     flex-direction: column;
     gap: 12px;
 
-    width: 272px;             
+    min-width: 272px;
+
+
+    /* width: 272px;              */
     background-color: #f0f0f0;
     padding: 20px;
     border-radius: 8px;
@@ -303,9 +308,7 @@ font-size: 12pt !important;
 
     background-color: black;
     color: rgb(255, 255, 255);
-    width: 1900px;
 
-    height: 100%;
 
 }
 

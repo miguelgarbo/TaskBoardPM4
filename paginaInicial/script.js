@@ -2,8 +2,8 @@
 //arrumar indexPosition
 
 
-
 const containerTasks = document.querySelector(".container-tasks")
+
 
 //função validando null de qualquer input
 
@@ -38,7 +38,6 @@ inputCheckBoxSwitch.addEventListener("change", function(){
         statusBackgroundText.textContent = "Light"
 
         containerTask.classList.add("light-mode-board")
-        header.classList.add("light-header")
         column.classList.add("light-mode-column")
 
 
@@ -46,7 +45,6 @@ inputCheckBoxSwitch.addEventListener("change", function(){
 
             statusBackgroundText.textContent = "Dark"
             containerTask.classList.remove("light-mode-board")
-            header.classList.remove("light-header")
             column.classList.remove("light-mode-column")
 
         }
@@ -58,9 +56,9 @@ const buttonNewColumn = document.getElementById("btn-new-column")
 
 buttonNewColumn.style.display = "none"
 
-buttonNewColumn.addEventListener("click", showColumn)
+buttonNewColumn.addEventListener("click", createColumn)
     
-function showColumn(){
+function createColumn(){
 
     //função que está criando uma coluna provisória com o input
     const containerTasks = document.querySelector(".container-tasks");
@@ -205,8 +203,7 @@ function showColumn(){
 
     }
 
-
-    //botando na tela
+    //printando na tela
     newColumn.appendChild(inputDiv)
     newColumn.appendChild(buttonConfirm)
 
@@ -413,15 +410,21 @@ async function getColumnsByBoardId(boardId) {
 
         const dataColumns = await response.json();
 
+
         console.log(dataColumns) //array das Columns
 
-        printColumns(dataColumns) //exibindo tds colunas antes das tasks
+
+            // containerTasks.innerHTML = ""; 
+        
+            printColumns(dataColumns); // Exibe as colunas antes das tasks   
 
         
         //iterarando o array de columns para acessar cada um
+
         dataColumns.forEach((column) => {
 
-            console.log(column)
+            console.log(column.Id)
+
             //o then aqui ta tratando o return da promise getTasksByColumnId
 
             getTasksByColumnId(column.Id).then((arrayTasks) => {
@@ -461,6 +464,7 @@ async function getTasksByColumnId(columnId) {
 
 function printColumns(columns) {
 
+
     columns.forEach((column) => {
 
         const columnDiv = document.createElement("div");
@@ -471,7 +475,6 @@ function printColumns(columns) {
             headerColumn.classList.add("header-column");
 
         const titleColumn = document.createElement("h5");
-            titleColumn.id = "name-task";
             titleColumn.textContent = column.Name;
 
         const itemPencil = document.createElement("i");
@@ -496,7 +499,10 @@ function printColumns(columns) {
 
             containerTasks.insertBefore(columnDiv, buttonNewColumn);
     });
+
+
 }
+
 
 function printTasks(columnId, arrayTasks) {
 
