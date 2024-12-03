@@ -1,21 +1,34 @@
 // import axios from 'axios'
-//arrumar indexPosition
 
+let boardSelected;
 
 const containerTasks = document.querySelector(".container-tasks")
 
+//pegar o id do usuario, dai colocar como parametro no getBoards?
+ async function getPersonConfigById(personId) {
+
+   const response = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/PersonConfigById?PersonId=${personId}`)
+        
+        const dataConfigUser = await response.json()
+   
+        console.log(dataConfigUser);
+        
+ }
+
+const person = JSON.parse(localStorage.getItem("userDatas"))
+
+console.log(person.id);
+
+getPersonConfigById(person.id)
 
 //função validando null de qualquer input
-
 function validNull(input){
 
     if (!input.trim()) {
 
         alert("Campo de texto Vazio, Por Favor digite algo antes de confirmar");
-
         return true
     }
-
     return false
 }
 
@@ -29,16 +42,13 @@ const containerTask = document.querySelector(".background-board")
 const header = document.getElementsByTagName("header")[0]
 const column = document.querySelector(".column")
 
-
 inputCheckBoxSwitch.addEventListener("change", function(){
-
 
     if(inputCheckBoxSwitch.checked){
 
         statusBackgroundText.textContent = "Light"
         containerTask.classList.add("light-mode-board")
         column.classList.add("light-mode-column")
-
 
         }else{
 
@@ -49,8 +59,7 @@ inputCheckBoxSwitch.addEventListener("change", function(){
         }
 })
 
-let currentBoardId = null;
-let currentColumnId = null;
+
 
 const buttonNewColumn = document.getElementById("btn-new-column")
 
@@ -59,10 +68,11 @@ buttonNewColumn.style.display = "none"
 buttonNewColumn.addEventListener("click", createColumn);
 
 function createColumn() {
+
     const containerTasks = document.querySelector(".container-tasks");
 
     let newColumn = document.createElement("div");
-
+    
         newColumn.classList.add("column", "input-column");
 
     let inputDiv = document.createElement("input");
@@ -122,8 +132,8 @@ function confirmColumnName(containerTasks, newColumn, inputDiv) {
     containerTasks.insertBefore(columnDiv, buttonNewColumn);
 
     newColumn.remove();
+     postColumns(boardSelected, inputNameColumn);
 
-        postColumns(currentBoardId, inputNameColumn);
             
 }
 
@@ -238,12 +248,12 @@ async function getBoardsToDropDown() {
         a.innerText = board.Name;
 
         li.appendChild(a)
-
         li.addEventListener("click", (e)=> {
             e.preventDefault()
 
             loadBoardPicked(board.Id)
             getColumnsByBoardId(board.Id)
+            boardSelected = board.Id
 
         })
 
@@ -260,39 +270,75 @@ async function loadBoardPicked(boardId){
 
     buttonNewColumn.style.display = "block"
 
-    const resposta = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Board?BoardId=${boardId}`)
+    try{
 
-    const dataBoard = await resposta.json()
+        const resposta = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Board?BoardId=${boardId}`)
 
-    const nameBoard = document.querySelector(".boardName")
+        const dataBoard = await resposta.json()
+    
+        const nameBoard = document.querySelector(".boardName")
+    
+        const descriptionBoard = document.querySelector(".boardDescription")
+    
+        // const backgroundBoard = document.querySelector(".background-board")
+    
+        nameBoard.innerText = dataBoard.Name
 
-    const descriptionBoard = document.querySelector(".boardDescription")
+        descriptionBoard.innerText = dataBoard.Description
+        // backgroundBoard.style.setProperty("background-color", dataBoard.HexaBackgroundCoor);
+        
+        console.log("ID DO BOARD:" + " " + boardId)
 
-    // const backgroundBoard = document.querySelector(".background-board")
+        
+    }catch(erro){
 
-    nameBoard.innerText = dataBoard.Name
-    descriptionBoard.innerText = dataBoard.Description
-    // backgroundBoard.style.setProperty("background-color", dataBoard.HexaBackgroundCoor);
+        console.error("Erro ao se Conectar ao Servidor", erro)
 
-    currentBoardId = boardId;
+    }
 
-    console.log("ID DO BOARD:" + " " + boardId);
 }
 
 getBoardsToDropDown()
 
 //fim
 
-function editBoard(column){
+function editBoard(columnDiv){
     
-    column.classList.add("edit-column-style")
+    columnDiv.classList.add("edit-column-style")
     
-    const nameColumnBefore = column.querySelector(".column-name");
+    const nameColumnBefore = columnDiv.querySelector(".column-name");
     const inputEditNameColumn = document.createElement("input")
 
         inputEditNameColumn.classList.add("form-control")
         inputEditNameColumn.id = "input-edit-name"
         inputEditNameColumn.value = nameColumnBefore.textContent
+
+
+    const trashIcon = document.createElement("i")
+
+            trashIcon.classList.add("bi", "bi-trash")
+
+            columnDiv.appendChild(trashIcon)
+
+                trashIcon.addEventListener("click", function(){
+
+                deleteColumn(columnDiv.id).then(() => {
+
+
+                        columnDiv.remove();
+
+                    alert("Coluna deletada com sucesso!");
+
+                })
+                .catch((erro) => {
+                    
+                    console.error("Erro ao deletar a coluna:", erro);
+                    alert("Falha ao deletar a coluna.");
+                });
+
+
+                
+                 })                
 
 
     nameColumnBefore.textContent = ""
@@ -333,6 +379,29 @@ function helloUser(){
 helloUser()
 
 
+async function deleteColumn(columnId) {
+
+    try{
+
+        const response = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Column?ColumnId=${columnId}`,
+            {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+
+    }catch(erro){
+
+        console.error("Erro De Delete ", erro)
+
+    }
+
+    
+    
+}
 
 
 function logout(){
@@ -354,7 +423,6 @@ async function postColumns(boardId,nameColumn) {
 
             BoardId: boardId,
             Name: nameColumn,
-            Position: indexPosition,
             IsActive: true,
             CreatedBy: 6, 
 
@@ -384,7 +452,6 @@ async function postColumns(boardId,nameColumn) {
     console.log("Coluna Criada com Sucesso, ID DA COLUNA: ", respostaDataColumn)
 
 
-    indexPosition++
 
     }catch(erro){
 
@@ -434,19 +501,14 @@ async function getColumnsByBoardId(boardId) {
 
         const dataColumns = await response.json();
 
-
         console.log(dataColumns) //array das Columns
-
         
-            printColumns(dataColumns); // Exibe as colunas antes das tasks  
+        printColumns(dataColumns); // Exibe as colunas antes das tasks  
 
-
-        
         //iterarando o array de columns para acessar cada um
         dataColumns.forEach((column) => {
 
             console.log(column.Id)
-            currentColumnId = column.Id
 
             //o then aqui ta tratando o return da promise getTasksByColumnId
             getTasksByColumnId(column.Id).then((arrayTasks) => {
@@ -455,12 +517,11 @@ async function getColumnsByBoardId(boardId) {
 
                     printTasks(column.Id, arrayTasks)
 
-
-
                 })
         });
 
     } catch (error) {
+
         console.error("Erro ao obter colunas:", error);
     }
 }
@@ -487,6 +548,8 @@ async function getTasksByColumnId(columnId) {
 }
 
 function printColumns(columns) {
+
+    containerTasks.innerHTML = "";
 
     columns.forEach((column) => {
 
@@ -532,9 +595,10 @@ function printColumns(columns) {
                 columnDiv.appendChild(buttonNewCard)
 
 
-            containerTasks.insertBefore(columnDiv, buttonNewColumn)
+            containerTasks.appendChild(columnDiv);
     });
 
+    containerTasks.appendChild(buttonNewColumn);
 
 }
 
@@ -557,3 +621,5 @@ function printTasks(columnId, arrayTasks) {
 
     });
 }
+
+
