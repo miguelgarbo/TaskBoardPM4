@@ -4,22 +4,35 @@ let boardSelected;
 
 const containerTasks = document.querySelector(".container-tasks")
 
-//pegar o id do usuario, dai colocar como parametro no getBoards?
- async function getPersonConfigById(personId) {
+function showStatusText(textStatus,trueOrFalse){
 
-   const response = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/PersonConfigById?PersonId=${personId}`)
-        
-        const dataConfigUser = await response.json()
-   
-        console.log(dataConfigUser);
-        
- }
+    let divStatus = document.querySelector(".status-function-text")
 
-const person = JSON.parse(localStorage.getItem("userDatas"))
+    if(!!trueOrFalse){
 
-console.log(person.id);
+        divStatus.classList.remove("error")
+        divStatus.classList.add("success")
+        divStatus.innerHTML = textStatus
+    
+         setTimeout(function() {
+            divStatus.innerHTML = ""}, 4000); 
+    
+    }else{
 
-getPersonConfigById(person.id)
+        divStatus.classList.remove("sucess")
+        divStatus.classList.add("error")
+        divStatus.innerHTML = textStatus
+    
+         setTimeout(function() {
+            divStatus.innerHTML = ""}, 4000); 
+
+    }
+
+    }
+
+
+
+
 
 //função validando null de qualquer input
 function validNull(input){
@@ -217,8 +230,6 @@ function confirmCard(columnDiv, buttonNewCard, inputCard, buttonConfirmDescripti
 }
 
 
-
-
 //pegar dados dos boards e printalos no dropdown
 
 async function getBoardsToDropDown() {
@@ -268,6 +279,8 @@ async function getBoardsToDropDown() {
 
 async function loadBoardPicked(boardId){
 
+
+
     buttonNewColumn.style.display = "block"
 
     try{
@@ -277,11 +290,9 @@ async function loadBoardPicked(boardId){
         const dataBoard = await resposta.json()
     
         const nameBoard = document.querySelector(".boardName")
-    
         const descriptionBoard = document.querySelector(".boardDescription")
-    
+
         // const backgroundBoard = document.querySelector(".background-board")
-    
         nameBoard.innerText = dataBoard.Name
 
         descriptionBoard.innerText = dataBoard.Description
@@ -293,6 +304,8 @@ async function loadBoardPicked(boardId){
     }catch(erro){
 
         console.error("Erro ao se Conectar ao Servidor", erro)
+        showStatusText(`Erro ao se Conectar ao Servidor`,false)
+
 
     }
 
@@ -313,7 +326,6 @@ function editBoard(columnDiv){
         inputEditNameColumn.id = "input-edit-name"
         inputEditNameColumn.value = nameColumnBefore.textContent
 
-
     const trashIcon = document.createElement("i")
 
             trashIcon.classList.add("bi", "bi-trash")
@@ -324,10 +336,17 @@ function editBoard(columnDiv){
 
                 deleteColumn(columnDiv.id).then(() => {
 
-
                         columnDiv.remove();
 
-                    alert("Coluna deletada com sucesso!");
+                    let divStatus = document.querySelector(".status-function-text")
+
+                    divStatus.classList.add("success");
+                    divStatus.innerHTML = `Coluna Deletada com sucesso`
+
+                    setTimeout(function(){
+
+                        divStatus.innerHTML = ""}, 3000)
+                    
 
                 })
                 .catch((erro) => {
@@ -396,10 +415,29 @@ async function deleteColumn(columnId) {
     }catch(erro){
 
         console.error("Erro De Delete ", erro)
-
     }
 
-    
+}
+
+
+async function deleteTaskByID(TaskId) {
+
+    try{
+
+        const response = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Task?TaskId=${TaskId}`,{
+
+            method: "DELETE", 
+            headers: { "Content-Type": "application/json"},
+        }
+
+        )
+
+        const dataTask = await response.json()
+
+    }catch(erro){
+
+        console.error(`Vish Caiu no reject : ${erro}`);   
+    }
     
 }
 
@@ -411,9 +449,9 @@ function logout(){
 
 }
 
-let indexPosition = 1
 
 async function postColumns(boardId,nameColumn) {
+
 
     const url = "https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Column"
 
@@ -424,7 +462,6 @@ async function postColumns(boardId,nameColumn) {
             BoardId: boardId,
             Name: nameColumn,
             IsActive: true,
-            CreatedBy: 6, 
 
             }
          
@@ -440,22 +477,27 @@ async function postColumns(boardId,nameColumn) {
 
         console.log(`Erro De Post ${response.statusText}`);
 
-        if(response.status === 400){
+        if(response.status === 422){
 
-            console.log("Erro do cliente")
+            console.log("Não foi possivel encontrar o quadro informado")
+            return
 
         }
     }
 
     const respostaDataColumn = await response.json()
 
+    
     console.log("Coluna Criada com Sucesso, ID DA COLUNA: ", respostaDataColumn)
 
+    showStatusText(`Coluna Criada com Sucesso :)`,true)
 
 
     }catch(erro){
 
         console.error("Erro de Servidor", erro)
+        showStatusText(`Erro De Servidor`,false)
+
     }
 
 }
@@ -613,10 +655,12 @@ function printTasks(columnId, arrayTasks) {
 
         const tasksStruct = document.createElement("div");
 
-        tasksStruct.classList.add("card-task");
-        tasksStruct.id = task.Id
+            tasksStruct.classList.add("card-task");
+            tasksStruct.id = task.Id
+            tasksStruct.textContent = task.Title;
+
+      
         
-        tasksStruct.textContent = task.Title;
         columnDiv.insertBefore(tasksStruct, buttonNewCard);
 
     });

@@ -342,6 +342,23 @@ font-size: 12pt !important;
     cursor: pointer;
 }
 
+.status-function-text{
+
+font-size: 4dvh;
+text-align: center;
+padding-bottom: 10px;
+
+}
+
+.success{
+
+color: green;
+
+}
+
+.error{
+    color: red;
+}
 
 
 
