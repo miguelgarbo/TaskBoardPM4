@@ -1040,17 +1040,9 @@ function printTasks(columnId, arrayTasks) {
             tasksStruct.classList.add("card-task");
             tasksStruct.id = task.Id
             tasksStruct.textContent = task.Title;
-
-      
         
         columnDiv.insertBefore(tasksStruct, buttonNewCard);
 
     });
 }
 
-
-async function patchNameColumn(params) {
-
-
-    
-}
