@@ -272,7 +272,6 @@ font-size: 12pt !important;
 
     border: 2px dashed blue; 
 
- 
 
 }
 
@@ -340,6 +339,21 @@ font-size: 12pt !important;
 .bi-trash{
 
     cursor: pointer;
+
+}
+
+
+.bi-trash:hover{
+
+    color: gray;
+
+}
+
+.bi-pencil:hover{
+    
+    color: gray;
+
+
 }
 
 .status-function-text{

@@ -1,5 +1,11 @@
 // import axios from 'axios'
 
+//  COISAS PARA FAZER AINDA 
+//arrumar erro de tirar o botãozinho de lixo de TODAS AS TASKS
+//usar o put para atualizar o nome de coluna ou task
+//usar o post para criar Board (opcional)
+
+let themeSelected;
 let boardSelected;
 
 const containerTasks = document.querySelector(".container-tasks")
@@ -55,9 +61,76 @@ const containerTask = document.querySelector(".background-board")
 const header = document.getElementsByTagName("header")[0]
 const column = document.querySelector(".column")
 
+var userId = JSON.parse(localStorage.getItem("userDatas")).id
+
+getPersonIdConfig(userId)
+
+//2 é dark mode 
+//1 é light mode
+
+async function patchThemeId(PersonId, themeSelected) {
+
+    const userThemeId =  {
+
+        "ThemeId": themeSelected
+    }
+
+    const response = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/ConfigPersonTheme?PersonId=${PersonId}`,
+
+        {
+            method: "PATCH",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(userThemeId)
+
+        }
+    )
+    
+}
+
+
+async function getPersonIdConfig(PersonId) {
+
+    try{
+        const response = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/PersonConfigById?PersonId=${PersonId}`)
+
+        const personData = await response.json()
+
+        const themeDefault = personData.DefaultThemeId;
+
+        saveBackGroundMode(themeDefault)
+
+    }catch(erro){
+
+        throw `Erro ao Pegar Person ID ${erro}`
+    }    
+}
+
+function saveBackGroundMode(oneOrTwo){
+
+    if(oneOrTwo === 1){
+
+        statusBackgroundText.textContent = "Light"
+        containerTask.classList.add("light-mode-board")
+        column.classList.add("light-mode-column")
+        inputCheckBoxSwitch.checked
+
+
+    }else{
+    
+        statusBackgroundText.textContent = "Dark"
+        containerTask.classList.remove("light-mode-board")
+        column.classList.remove("light-mode-column")
+
+    }
+
+
+}
+
 inputCheckBoxSwitch.addEventListener("change", function(){
 
     if(inputCheckBoxSwitch.checked){
+
+        patchThemeId(userId,1)
 
         statusBackgroundText.textContent = "Light"
         containerTask.classList.add("light-mode-board")
@@ -65,12 +138,16 @@ inputCheckBoxSwitch.addEventListener("change", function(){
 
         }else{
 
+            patchThemeId(userId,2)
+
             statusBackgroundText.textContent = "Dark"
             containerTask.classList.remove("light-mode-board")
             column.classList.remove("light-mode-column")
 
         }
 })
+
+
 
 
 
@@ -102,13 +179,15 @@ function createColumn() {
         buttonConfirm.type = "button";
         buttonConfirm.textContent = "Confirmar Coluna";
 
-    buttonConfirm.addEventListener("click", function(){ 
+    buttonConfirm.addEventListener("click", ()=>{ 
 
         confirmColumnName(containerTasks, newColumn, inputDiv)
     });
 
             newColumn.appendChild(inputDiv);
             newColumn.appendChild(buttonConfirm);
+
+            containerTasks.appendChild(newColumn)
 
     containerTasks.insertBefore(newColumn, buttonNewColumn);
 }
@@ -145,9 +224,9 @@ function confirmColumnName(containerTasks, newColumn, inputDiv) {
     containerTasks.insertBefore(columnDiv, buttonNewColumn);
 
     newColumn.remove();
+
      postColumns(boardSelected, inputNameColumn);
 
-            
 }
 
 function createHeaderColumn(inputNameColumn, columnDiv) {
@@ -204,7 +283,6 @@ function createNewCards(columnDiv, buttonNewCard) {
 
 function confirmCard(columnDiv, buttonNewCard, inputCard, buttonConfirmDescriptionCard) {
 
-
     const descriptionCard = inputCard.value;
 
     if (validNull(descriptionCard)) {
@@ -224,8 +302,6 @@ function confirmCard(columnDiv, buttonNewCard, inputCard, buttonConfirmDescripti
     const columnId = columnDiv.id
 
     postTasks(columnId, descriptionCard);
-
-
 
 }
 
@@ -279,27 +355,20 @@ async function getBoardsToDropDown() {
 
 async function loadBoardPicked(boardId){
 
-
-
     buttonNewColumn.style.display = "block"
+
+        const nameBoard = document.querySelector(".boardName")
+        const descriptionBoard = document.querySelector(".boardDescription")
 
     try{
 
         const resposta = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Board?BoardId=${boardId}`)
-
         const dataBoard = await resposta.json()
     
-        const nameBoard = document.querySelector(".boardName")
-        const descriptionBoard = document.querySelector(".boardDescription")
-
-        // const backgroundBoard = document.querySelector(".background-board")
-        nameBoard.innerText = dataBoard.Name
-
-        descriptionBoard.innerText = dataBoard.Description
-        // backgroundBoard.style.setProperty("background-color", dataBoard.HexaBackgroundCoor);
+            nameBoard.innerText = dataBoard.Name
+            descriptionBoard.innerText = dataBoard.Description
         
         console.log("ID DO BOARD:" + " " + boardId)
-
         
     }catch(erro){
 
@@ -315,72 +384,81 @@ getBoardsToDropDown()
 
 //fim
 
-function editBoard(columnDiv){
-    
+
+function editBoard(columnDiv) {
+
+
     columnDiv.classList.add("edit-column-style")
-    
+
+    const cardTasks = columnDiv.querySelectorAll(".card-task")
+
+    const trashIconForColumn = document.createElement("i")
+    trashIconForColumn.classList.add("bi", "bi-trash")
+
+
+    cardTasks.forEach(cardTask => {
+        const iconTrashForTask = document.createElement("i")
+
+            iconTrashForTask.classList.add("bi", "bi-trash")
+
+        iconTrashForTask.addEventListener("click", function () {
+
+            deleteTaskByID(cardTask.id).then(() => {
+
+                trashIconForColumn.remove()
+                iconTrashForTask.remove()
+
+                columnDiv.classList.remove("edit-column-style")
+                cardTask.remove()
+                showStatusText("Task Deletada com sucesso", false)
+                 
+            });
+        });
+
+
+        cardTask.appendChild(iconTrashForTask); 
+
+    });
+
     const nameColumnBefore = columnDiv.querySelector(".column-name");
-    const inputEditNameColumn = document.createElement("input")
+    const inputEditNameColumn = document.createElement("input");
 
-        inputEditNameColumn.classList.add("form-control")
-        inputEditNameColumn.id = "input-edit-name"
-        inputEditNameColumn.value = nameColumnBefore.textContent
+    inputEditNameColumn.classList.add("form-control")
+    inputEditNameColumn.id = "input-edit-name"
+    inputEditNameColumn.value = nameColumnBefore.textContent
 
-    const trashIcon = document.createElement("i")
+    inputEditNameColumn.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            columnDiv.classList.remove("edit-column-style");
 
-            trashIcon.classList.add("bi", "bi-trash")
+            const newNameColumn = inputEditNameColumn.value;
 
-            columnDiv.appendChild(trashIcon)
-
-                trashIcon.addEventListener("click", function(){
-
-                deleteColumn(columnDiv.id).then(() => {
-
-                        columnDiv.remove();
-
-                    let divStatus = document.querySelector(".status-function-text")
-
-                    divStatus.classList.add("success");
-                    divStatus.innerHTML = `Coluna Deletada com sucesso`
-
-                    setTimeout(function(){
-
-                        divStatus.innerHTML = ""}, 3000)
-                    
-
-                })
-                .catch((erro) => {
-                    
-                    console.error("Erro ao deletar a coluna:", erro);
-                    alert("Falha ao deletar a coluna.");
-                });
-
-
-                
-                 })                
-
-
-    nameColumnBefore.textContent = ""
-
-            nameColumnBefore.appendChild(inputEditNameColumn)
-
-
-    inputEditNameColumn.addEventListener("keydown", function(e){
-
-        if (e.key === "Enter") { 
-            column.classList.remove("edit-column-style")
-
-            const newNameColumn = inputEditNameColumn.value
-
-
-            if(validNull(newNameColumn)){
-                return
+            if (validNull(newNameColumn)) {
+                return;
             }
-      
+
             nameColumnBefore.textContent = newNameColumn;
             inputEditNameColumn.remove()
         }
     })
+
+    nameColumnBefore.textContent = ""
+    nameColumnBefore.appendChild(inputEditNameColumn)
+
+    trashIconForColumn.addEventListener("click", function () {
+
+        deleteColumn(columnDiv.id).then(() => {
+            columnDiv.remove();
+            showStatusText("Coluna Deletada com sucesso", false)
+
+        }).catch((erro) => {
+            console.error("Erro ao deletar a coluna:", erro)
+            showStatusText("Falha ao Deletar coluna", false)
+        });
+    });
+
+        trashIconForColumn.remove()
+    columnDiv.appendChild(trashIconForColumn);
 }
 
 function helloUser(){
@@ -593,9 +671,14 @@ function printColumns(columns) {
 
     containerTasks.innerHTML = "";
 
-    columns.forEach((column) => {
+    const ascendingColumns = columns.sort((a, b) => a.Id - b.Id);
+
+    ascendingColumns.forEach((column) => {
+
+        console.log(ascendingColumns)
 
         const columnDiv = document.createElement("div")
+
             columnDiv.classList.add("column")
             columnDiv.id = column.Id
 
@@ -613,6 +696,7 @@ function printColumns(columns) {
 
             itemPencil.classList.add("bi", "bi-pencil")
             itemPencil.id = "edit-column"
+
             itemPencil.addEventListener("click", function() {
                 editBoard(columnDiv);
             });
@@ -667,3 +751,8 @@ function printTasks(columnId, arrayTasks) {
 }
 
 
+async function patchNameColumn(params) {
+
+
+    
+}
