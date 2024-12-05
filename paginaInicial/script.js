@@ -21,15 +21,15 @@ const divBoardSection = document.querySelector(".boards-functions")
 var userId = JSON.parse(localStorage.getItem("userDatas")).id
 
 
-var handWave = `<picture>
-  <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44b/512.webp" type="image/webp">
-  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44b/512.gif" alt="👋" width="32" height="32">
-</picture>`
+// var handWave = `<picture>
+//   <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44b/512.webp" type="image/webp">
+//   <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44b/512.gif" alt="👋" width="32" height="32">
+// </picture>`
 
-var emojiSmile = `<picture>
-  <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f601/512.webp" type="image/webp">
-  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f601/512.gif" alt="😁" width="32" height="32">
-</picture>`
+// var emojiSmile = `<picture>
+//   <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f601/512.webp" type="image/webp">
+//   <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f601/512.gif" alt="😁" width="32" height="32">
+// </picture>`
 
 
 const buttonBoard = document.querySelector("#btnCreateBoard")
@@ -119,6 +119,7 @@ buttonBoard.addEventListener("click", function(){
 
         inputNameBoard.addEventListener("keydown", function(e){
 
+
             if(e.key === "Enter"){
 
                 const nameBoardValue = inputNameBoard.value
@@ -128,11 +129,20 @@ buttonBoard.addEventListener("click", function(){
                 return
             }
 
+            if(nameBoardValue.length < 10){
+
+                showStatusText(`O Nome do Quadro Deve Conter Mais de 10 Caracteres, Tente Novamente`)
+                return                
+
+            }
+
                 inputNameBoard.value = nameBoardValue
 
                 divBoardSection.appendChild(inputDescriptionBoard)
 
                 inputDescriptionBoard.addEventListener("keydown", function(e){
+
+
 
                     if(e.key === "Enter"){
 
@@ -154,6 +164,12 @@ buttonBoard.addEventListener("click", function(){
                             inputDescriptionBoard.remove()
 
                         }, 1000)
+
+                        setTimeout(() => {
+
+                            window.location.reload()
+                            
+                        }, 2000);
 
                         showStatusText(`Quadro '${nameBoardValue}' de Descrição '${descriptionBoardValue}', Criado Com Sucesso  `, true)
 
@@ -190,6 +206,19 @@ async function postBoard(nameBoard, descriptionBoard){
     
         }
     )
+
+    if(!response.ok){
+
+        console.error(`Erro ao Fazer Post De Board`)
+
+        if(response === 422){
+
+            showStatusText(`O Nome do Quadro Deve Conter Mais de 10 Caracteres, Tente Novamente`)
+            return
+
+        }    
+
+    }
 
     const idNewBoard = await response.json()
     console.log(`Novo Board de Id: ${idNewBoard}`);
@@ -746,7 +775,7 @@ function helloUser(){
 
    console.log(dataUser);
 
-   boardName.innerHTML = `Olá, ${dataUser.name.split(" ")[0]} ${emojiSmile}`
+   boardName.innerHTML = `Olá, ${dataUser.name.split(" ")[0]}`
 
 }
 
@@ -887,9 +916,8 @@ async function postTasks(columnId, titleTask){
         Title: titleTask,
         Description: "",
         IsActive: true,
-        CreatedBy: 6
+        CreatedBy: userId
 }
-
 
     const response = await fetch("https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Task",
         {
