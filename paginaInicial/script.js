@@ -1,14 +1,207 @@
 // import axios from 'axios'
 
 //  COISAS PARA FAZER AINDA 
-//arrumar erro de tirar o botãozinho de lixo de TODAS AS TASKS
-//usar o put para atualizar o nome de coluna ou task
-//usar o post para criar Board (opcional)
+
+//usar o put para atualizar o nome de task
 
 let themeSelected;
 let boardSelected;
 
 const containerTasks = document.querySelector(".container-tasks")
+
+const inputCheckBoxSwitch = document.getElementById("background-button")
+const statusBackgroundText = document.querySelector("#status-background")
+
+const containerTask = document.querySelector(".background-board")
+const header = document.getElementsByTagName("header")[0]
+const column = document.querySelector(".column")
+
+const divBoardSection = document.querySelector(".boards-functions")
+
+var userId = JSON.parse(localStorage.getItem("userDatas")).id
+
+
+var handWave = `<picture>
+  <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44b/512.webp" type="image/webp">
+  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44b/512.gif" alt="👋" width="32" height="32">
+</picture>`
+
+var emojiSmile = `<picture>
+  <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f601/512.webp" type="image/webp">
+  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f601/512.gif" alt="😁" width="32" height="32">
+</picture>`
+
+
+const buttonBoard = document.querySelector("#btnCreateBoard")
+
+
+
+async function putBoardNameDescription(idBoard, newNameBoard, newDescriptionBoard){
+
+    const dataNewBoard = {
+        
+            "Id": idBoard,
+            "Name": newNameBoard,
+            "Description": newDescriptionBoard,
+            "IsActive": true,
+            "CreatedBy": userId,
+}
+
+
+    try{
+
+        const response = await fetch("https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Board",
+            {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(dataNewBoard)
+            }
+        )
+
+        
+    }catch(erro){
+
+        throw new Error(`Erro ao Atulizar Board ${erro}`);
+       
+    }
+
+}
+
+
+async function putNameColumn(columnId, boardId, newNameColumn) {
+
+    try{
+
+        const dataPutColumn ={
+
+            Id: columnId ,
+            BoardId: boardId,
+            Name: newNameColumn,
+            IsActive: true,
+        }
+    
+        const response = await fetch("https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Column",
+            {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(dataPutColumn)
+    
+            }
+        )
+    }catch(erro){
+
+        throw `Erro ao Atualizar Coluna: ${erro}`
+
+    }
+
+   
+    
+}
+
+buttonBoard.addEventListener("click", function(){
+
+        const inputNameBoard = document.createElement("input")
+
+            inputNameBoard.type = "text"
+            inputNameBoard.classList.add("form-control", "form-board")
+            inputNameBoard.placeholder = "Nome do Quadro"
+            inputNameBoard.title = "Clique na Tecla Enter para Confirmar o Nome do Quadro"
+
+        const inputDescriptionBoard = document.createElement("input")
+
+            inputDescriptionBoard.type = "text"
+            inputDescriptionBoard.classList.add("form-control", "form-board")
+            inputDescriptionBoard.placeholder = "Descrição do Quadro"
+            inputDescriptionBoard.title = "Clique na Tecla Enter para Confirmar a Descrição de Quadro"
+
+        
+        divBoardSection.appendChild(inputNameBoard)
+
+        inputNameBoard.addEventListener("keydown", function(e){
+
+            if(e.key === "Enter"){
+
+                const nameBoardValue = inputNameBoard.value
+                
+            if(validNull(nameBoardValue)){
+
+                return
+            }
+
+                inputNameBoard.value = nameBoardValue
+
+                divBoardSection.appendChild(inputDescriptionBoard)
+
+                inputDescriptionBoard.addEventListener("keydown", function(e){
+
+                    if(e.key === "Enter"){
+
+                        const descriptionBoardValue = inputDescriptionBoard.value
+
+                        if(validNull(descriptionBoardValue)){
+
+                            return
+                        }
+
+    
+                        inputDescriptionBoard.value = descriptionBoardValue
+
+                        postBoard(nameBoardValue, descriptionBoardValue)
+
+                        setTimeout(()=>{
+
+                            inputNameBoard.remove()
+                            inputDescriptionBoard.remove()
+
+                        }, 1000)
+
+                        showStatusText(`Quadro '${nameBoardValue}' de Descrição '${descriptionBoardValue}', Criado Com Sucesso  `, true)
+
+                    }
+                })
+
+                
+            }
+        });
+
+        
+
+
+})
+
+async function postBoard(nameBoard, descriptionBoard){
+
+    try{
+
+        const dataBoard = {
+
+            "Name": nameBoard,
+            "Description": descriptionBoard,
+            "IsActive": true,
+            "CreatedBy": userId,
+        }
+    
+    
+    const response = await fetch("https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Board",
+        {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(dataBoard)
+    
+        }
+    )
+
+    const idNewBoard = await response.json()
+    console.log(`Novo Board de Id: ${idNewBoard}`);
+    
+
+    }catch(erro){
+
+        throw `Erro ao Postar Board: ${erro}`
+    }
+
+}
+
 
 function showStatusText(textStatus,trueOrFalse){
 
@@ -37,33 +230,24 @@ function showStatusText(textStatus,trueOrFalse){
     }
 
 
-
-
-
 //função validando null de qualquer input
 function validNull(input){
 
     if (!input.trim()) {
 
-        alert("Campo de texto Vazio, Por Favor digite algo antes de confirmar");
+        showStatusText("Campo de texto Vazio, Por Favor digite algo antes de confirmar", false)
         return true
     }
     return false
 }
 
 
-//alternando bg mode
 
-const inputCheckBoxSwitch = document.getElementById("background-button")
-const statusBackgroundText = document.querySelector("#status-background")
+window.onload = ()=>{
 
-const containerTask = document.querySelector(".background-board")
-const header = document.getElementsByTagName("header")[0]
-const column = document.querySelector(".column")
+    getPersonIdConfig(userId)
 
-var userId = JSON.parse(localStorage.getItem("userDatas")).id
-
-getPersonIdConfig(userId)
+}
 
 //2 é dark mode 
 //1 é light mode
@@ -108,18 +292,22 @@ async function getPersonIdConfig(PersonId) {
 function saveBackGroundMode(oneOrTwo){
 
     if(oneOrTwo === 1){
+        inputCheckBoxSwitch.checked = true;
+
 
         statusBackgroundText.textContent = "Light"
         containerTask.classList.add("light-mode-board")
         column.classList.add("light-mode-column")
-        inputCheckBoxSwitch.checked
 
 
     }else{
     
+        inputCheckBoxSwitch.checked = false;
+
         statusBackgroundText.textContent = "Dark"
         containerTask.classList.remove("light-mode-board")
         column.classList.remove("light-mode-column")
+
 
     }
 
@@ -146,10 +334,6 @@ inputCheckBoxSwitch.addEventListener("change", function(){
 
         }
 })
-
-
-
-
 
 const buttonNewColumn = document.getElementById("btn-new-column")
 
@@ -246,7 +430,7 @@ function createHeaderColumn(inputNameColumn, columnDiv) {
         itemPencil.id = "edit-column";
 
     itemPencil.addEventListener("click", function(){
-        editBoard(columnDiv)
+        editColumn(columnDiv)
     });
 
     headerColumn.appendChild(titleColumn);
@@ -301,6 +485,7 @@ function confirmCard(columnDiv, buttonNewCard, inputCard, buttonConfirmDescripti
 
     const columnId = columnDiv.id
 
+    showStatusText(`Tarefa '${descriptionCard}' Criada Com Sucesso`, true)
     postTasks(columnId, descriptionCard);
 
 }
@@ -359,6 +544,90 @@ async function loadBoardPicked(boardId){
 
         const nameBoard = document.querySelector(".boardName")
         const descriptionBoard = document.querySelector(".boardDescription")
+        const boardTexts = document.getElementsByClassName("board-texts")[0]
+
+        const buttonExcludeBoard = document.createElement("button")
+
+            buttonExcludeBoard.textContent = "Deletar Quadro"
+            buttonExcludeBoard.type = "button"
+            buttonExcludeBoard.classList.add("btn", "btn-danger")
+
+            buttonExcludeBoard.addEventListener("click", function(){
+
+                showStatusText(`Quadro '${nameBoard.textContent}' Excluido Com Sucesso`, false)
+                
+                deleteBoard(boardId)
+
+                setTimeout(()=>{
+
+                    window.location.reload()
+                },3000)
+            })
+
+    
+        nameBoard.addEventListener("dblclick", function(){
+
+
+            nameBoard.classList.add("edit-board")
+            descriptionBoard.classList.add("edit-board")
+
+            const inputNewNameBoard = document.createElement("input")
+
+                inputNewNameBoard.type = "text"
+                inputNewNameBoard.classList.add("form-control", "form-new")
+                inputNewNameBoard.value = nameBoard.textContent
+                inputNewNameBoard.placeholder = "Informe o Novo Nome Do Quadro"
+                inputNewNameBoard.title = "Informe o Novo Nome Do Quadro"
+
+                    nameBoard.appendChild(inputNewNameBoard)
+
+            const inputNewDescription = document.createElement("input")
+
+                inputNewDescription.type = "text"
+                inputNewDescription.classList.add("form-control", "form-new")
+                inputNewDescription.value = descriptionBoard.textContent
+                inputNewDescription.placeholder = "Informe a Nova Descrição Do Quadro"
+                inputNewDescription.title = "Informe a Nova Descrição Do Quadro"
+
+                inputNewDescription.disabled = true
+
+                    descriptionBoard.appendChild(inputNewDescription)
+
+                    boardTexts.appendChild(buttonExcludeBoard)
+
+            inputNewNameBoard.addEventListener("keydown", function(e){
+
+            if(e.key === "Enter"){
+
+                nameBoard.classList.remove("edit-board")
+
+                inputNewDescription.disabled = false
+
+                const newNameBoard = inputNewNameBoard.value 
+
+                nameBoard.textContent = newNameBoard
+
+                inputNewDescription.addEventListener("keydown", function(e){
+
+                    if(e.key === "Enter"){
+
+                         descriptionBoard.classList.remove("edit-board")
+
+                        const newDescription = inputNewDescription.value
+
+                        descriptionBoard.textContent = newDescription
+
+                        showStatusText(`Quadro Atualizado Com Sucesso`, true)
+                        putBoardNameDescription(boardSelected, newNameBoard, newDescription)
+
+                    }
+
+        })
+       };
+    })
+ })
+
+
 
     try{
 
@@ -385,7 +654,7 @@ getBoardsToDropDown()
 //fim
 
 
-function editBoard(columnDiv) {
+function editColumn(columnDiv) {
 
 
     columnDiv.classList.add("edit-column-style")
@@ -406,11 +675,11 @@ function editBoard(columnDiv) {
             deleteTaskByID(cardTask.id).then(() => {
 
                 trashIconForColumn.remove()
-                iconTrashForTask.remove()
+                document.querySelectorAll(".bi-trash").forEach(trashIcon => trashIcon.remove());
 
                 columnDiv.classList.remove("edit-column-style")
                 cardTask.remove()
-                showStatusText("Task Deletada com sucesso", false)
+                showStatusText(`Tarefa '${cardTask.textContent}' Deletada com sucesso`, false)
                  
             });
         });
@@ -439,6 +708,12 @@ function editBoard(columnDiv) {
 
             nameColumnBefore.textContent = newNameColumn;
             inputEditNameColumn.remove()
+            trashIconForColumn.remove()
+            document.querySelectorAll(".bi-trash").forEach(trashIcon => trashIcon.remove());
+
+
+            showStatusText(`Coluna Atualizada com Sucesso`, true)
+            putNameColumn(columnDiv.id, boardSelected, newNameColumn)
         }
     })
 
@@ -461,6 +736,8 @@ function editBoard(columnDiv) {
     columnDiv.appendChild(trashIconForColumn);
 }
 
+
+
 function helloUser(){
 
     const boardName = document.querySelector(".boardName")
@@ -469,11 +746,32 @@ function helloUser(){
 
    console.log(dataUser);
 
-   boardName.innerHTML = `Olá, ${dataUser.name.split(" ")[0]}`
+   boardName.innerHTML = `Olá, ${dataUser.name.split(" ")[0]} ${emojiSmile}`
 
 }
 
 helloUser()
+
+async function deleteBoard(BoardId) {
+
+
+    try{
+
+        const response = await fetch(`https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Board?BoardId=${BoardId}`,
+            {
+                method: "DELETE",
+                headers: {"Content-Type":"application/json"}
+            }
+        )
+
+
+
+    }catch(erro){
+
+        throw `Erro ao Deletar Board: ${erro}`
+    }
+    
+}
 
 
 async function deleteColumn(columnId) {
@@ -568,7 +866,7 @@ async function postColumns(boardId,nameColumn) {
     
     console.log("Coluna Criada com Sucesso, ID DA COLUNA: ", respostaDataColumn)
 
-    showStatusText(`Coluna Criada com Sucesso :)`,true)
+    showStatusText(`Coluna '${nameColumn}' Criada com Sucesso :)`,true)
 
 
     }catch(erro){
@@ -698,7 +996,7 @@ function printColumns(columns) {
             itemPencil.id = "edit-column"
 
             itemPencil.addEventListener("click", function() {
-                editBoard(columnDiv);
+                editColumn(columnDiv);
             });
             
         const buttonNewCard = document.createElement("button")

@@ -18,9 +18,11 @@
           </nav>
           
           <header>
+
+            <div class="boards-functions">
             <div class="dropdown">
                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                    Boards
+                    Quadros
                 </a>
             
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
@@ -28,13 +30,15 @@
                     
                 </ul>
             </div>
+
+            <button type="button" id="btnCreateBoard" class="btn btn-light">Criar Quadro</button>
+        </div>
     
             <div class="info-user">
     
-                <p id="nameUser"></p>
                 <p class="logout-button" onclick="logout()">Logout</p>
                 
-    
+
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="background-button">
                     <label class="form-check-label" for="backgroundMode" id="status-background">Dark</label>
@@ -49,7 +53,7 @@
 
         <div class="board-texts">
             <h2 class="boardName"></h2>
-        <h4 class="boardDescription">Selecione um Board</h4>
+        <h4 class="boardDescription">Selecione um Quadro</h4>
     </div>
 
     <div class="status-function-text"></div>
