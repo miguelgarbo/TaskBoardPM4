@@ -1,12 +1,12 @@
 const btnAcessWithEmail = document.getElementById("btnAcess");
 const textErrorDiv = document.querySelector("#textError")
 
-function showButtonLoading (buttonParameter, responseBool){
+// function showButtonLoading (buttonParameter, responseBool){
 
-    buttonParameter.disabled = responseBool;
-    buttonParameter.textContent = responseBool ? "Carregando......" : "Acessar";
+//     buttonParameter.disabled = responseBool;
+//     buttonParameter.textContent = responseBool ? "Carregando......" : "Acessar";
 
- }
+//  }
 
 function showMessage(message){
 
@@ -35,7 +35,7 @@ btnAcessWithEmail.addEventListener("click", function(e){
 
 async function getPersonByEmail(emailInput) {
 
-    showButtonLoading(btnAcessWithEmail,false);
+    // showButtonLoading(btnAcessWithEmail,false);
 
     try{
 
@@ -73,7 +73,12 @@ async function getPersonByEmail(emailInput) {
 
         
             showMessage("Email Valido !")
-            window.location.href = "/paginaInicial/index.html";
+
+            setTimeout(()=>{
+
+                window.location.href = "/paginaInicial/index.html";
+
+            },1000)
 
               
 
@@ -90,21 +95,6 @@ async function getPersonByEmail(emailInput) {
 
 }
 
-
-function helloUser(){
-
-
-    const welcomeDiv = document.querySelector(".welcome-text")
-
-    const dataUser = JSON.parse(localStorage.getItem("userDatas"))
-
-    if(dataUser){
-        welcomeDiv.innerText = `Bem Vindo ${dataUser.name.split(' ')[0]}`
-    }
-
-}
-
-helloUser()
 
 function valueEmailLogin(){
 

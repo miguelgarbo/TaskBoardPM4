@@ -139,6 +139,21 @@ async function putNameColumn(columnId, boardId, newNameColumn) {
 
 buttonBoard.addEventListener("click", function(){
 
+    buttonBoard.disabled = true
+
+        const xIcon = document.createElement("i")
+
+            xIcon.classList.add("bi","bi-x")
+
+            xIcon.addEventListener("click", function(){
+
+                inputNameBoard.remove()
+                inputDescriptionBoard.remove()
+                xIcon.remove()
+
+            })
+            
+
         const inputNameBoard = document.createElement("input")
 
             inputNameBoard.type = "text"
@@ -155,6 +170,7 @@ buttonBoard.addEventListener("click", function(){
 
         
         divBoardSection.appendChild(inputNameBoard)
+        divBoardSection.appendChild(xIcon)
 
         inputNameBoard.addEventListener("keydown", function(e){
 
@@ -177,7 +193,7 @@ buttonBoard.addEventListener("click", function(){
 
                 inputNameBoard.value = nameBoardValue
 
-                divBoardSection.appendChild(inputDescriptionBoard)
+                divBoardSection.insertBefore(inputDescriptionBoard, xIcon)
 
                 inputDescriptionBoard.addEventListener("keydown", function(e){
 
@@ -282,7 +298,7 @@ function showStatusText(textStatus,trueOrFalse){
         divStatus.innerHTML = textStatus
     
          setTimeout(function() {
-            divStatus.innerHTML = ""}, 4000); 
+            divStatus.innerHTML = ""}, 3000); 
     
     }else{
 
@@ -291,7 +307,7 @@ function showStatusText(textStatus,trueOrFalse){
         divStatus.innerHTML = textStatus
     
          setTimeout(function() {
-            divStatus.innerHTML = ""}, 4000); 
+            divStatus.innerHTML = ""}, 3000); 
 
     }
 
@@ -768,6 +784,7 @@ function editColumn(columnDiv) {
 
                             showStatusText(`Tarefa atualizada, Com Sucesso`, true)
 
+                            pencilIconForTask.remove()
                             inputEditNameColumn.remove()
                             columnDiv.classList.remove("edit-column-style")
                             trashIconForColumn.remove()

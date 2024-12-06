@@ -187,6 +187,18 @@ select{
 
 }
 
+.bi-x{
+
+    font-size: 22pt;
+    cursor: pointer;
+}
+
+.bi-x:hover{
+
+    color: gray;
+
+}
+
 .card-task{
 
     display: flex;
