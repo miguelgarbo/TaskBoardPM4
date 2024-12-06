@@ -35,16 +35,52 @@ var userId = JSON.parse(localStorage.getItem("userDatas")).id
 const buttonBoard = document.querySelector("#btnCreateBoard")
 
 
+async function putTaskName(taskId, columnId, newTitleTask) {
+
+    const putTaskData = 
+    {
+         Id: taskId,
+         ColumnId: columnId,
+         Title: newTitleTask,
+         Description: "",
+         IsActive: true,
+         CreatedBy: userId,
+         UpdatedBy: userId
+  }
+
+    try{
+
+
+    const response = await fetch("https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Task", 
+        {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(putTaskData)
+
+        }
+    )
+
+
+    }catch(erro){
+
+        throw `Erro ao Atualizar Task ${erro}`
+
+    }
+
+
+}
+
 
 async function putBoardNameDescription(idBoard, newNameBoard, newDescriptionBoard){
 
     const dataNewBoard = {
         
-            "Id": idBoard,
-            "Name": newNameBoard,
-            "Description": newDescriptionBoard,
-            "IsActive": true,
-            "CreatedBy": userId,
+            Id: idBoard,
+            Name: newNameBoard,
+            Description: newDescriptionBoard,
+            IsActive: true,
+            CreatedBy: userId,
+            UpdatedBy: userId
 }
 
 
@@ -78,6 +114,9 @@ async function putNameColumn(columnId, boardId, newNameColumn) {
             BoardId: boardId,
             Name: newNameColumn,
             IsActive: true,
+            CreatedBy: userId,
+            UpdatedBy: userId
+
         }
     
         const response = await fetch("https://personal-ga2xwx9j.outsystemscloud.com/TaskBoard_CS/rest/TaskBoard/Column",
@@ -323,10 +362,12 @@ function saveBackGroundMode(oneOrTwo){
     if(oneOrTwo === 1){
         inputCheckBoxSwitch.checked = true;
 
-
         statusBackgroundText.textContent = "Light"
+        console.log("bg: ", statusBackgroundText)
         containerTask.classList.add("light-mode-board")
+        console.log("cont:", containerTask)
         column.classList.add("light-mode-column")
+        console.log("col:", column)
 
 
     }else{
@@ -695,11 +736,54 @@ function editColumn(columnDiv) {
 
 
     cardTasks.forEach(cardTask => {
+
+        const pencilIconForTask = document.createElement("i")
+
+            pencilIconForTask.classList.add("bi", "bi-pencil")
+
+            pencilIconForTask.addEventListener("click", function(){
+
+                let saveTextContent = cardTask.textContent
+
+                cardTask.textContent = ""
+
+                const inputNewNameTask = document.createElement("input")
+
+                    inputNewNameTask.classList.add("form-control")
+                    inputNewNameTask.type = "text"
+                    inputNewNameTask.value = saveTextContent
+                    inputNewNameTask.placeholder = "Informe a Nova Descrição do Cartão"
+
+                    cardTask.appendChild(inputNewNameTask)
+
+                    inputNewNameTask.addEventListener("keydown", function(e){
+
+                        if(e.key === "Enter"){
+
+                            let newNameTask = inputNewNameTask.value
+
+                            cardTask.textContent = newNameTask
+
+                            putTaskName(cardTask.id, columnDiv.id, newNameTask)
+
+                            showStatusText(`Tarefa atualizada, Com Sucesso`, true)
+
+                            inputEditNameColumn.remove()
+                            columnDiv.classList.remove("edit-column-style")
+                            trashIconForColumn.remove()
+
+
+                        }
+
+                    })
+            })
+
+
         const iconTrashForTask = document.createElement("i")
 
             iconTrashForTask.classList.add("bi", "bi-trash")
 
-        iconTrashForTask.addEventListener("click", function () {
+                iconTrashForTask.addEventListener("click", function () {
 
             deleteTaskByID(cardTask.id).then(() => {
 
@@ -713,8 +797,8 @@ function editColumn(columnDiv) {
             });
         });
 
-
-        cardTask.appendChild(iconTrashForTask); 
+        cardTask.appendChild(pencilIconForTask)
+        cardTask.appendChild(iconTrashForTask) 
 
     });
 
@@ -726,6 +810,7 @@ function editColumn(columnDiv) {
     inputEditNameColumn.value = nameColumnBefore.textContent
 
     inputEditNameColumn.addEventListener("keydown", function (e) {
+
         if (e.key === "Enter") {
             columnDiv.classList.remove("edit-column-style");
 

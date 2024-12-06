@@ -189,6 +189,9 @@ select{
 
 .card-task{
 
+    display: flex;
+
+    gap: 8px;
     padding: 8px;
     border: 1px solid black;
     width: 272px;
